@@ -17,10 +17,10 @@ services:
       - ./docker/mariadb/data:/var/lib/mysql/
     healthcheck:
         test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
-        start_period: 5s
+        start_period: 10s
         interval: 10s
-        timeout: 5s
-        retries: 6
+        timeout: 10s
+        retries: 10
 
   web:
     container_name: cicd-api
