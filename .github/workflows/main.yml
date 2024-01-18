@@ -110,21 +110,12 @@ env:
   NODE_ENV: development
   REGISTRY: ghcr.io
 jobs:
-  tests:
+  test:
+    #needs: [lint]
+    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: adambirds/docker-compose-action@v1.3.0
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          NODE_ENV: development
-        with:
-          compose-file: "./docker-compose.yml"
-          down-flags: "--volumes"
-          services: api
-          test-container: api
-          test-command: "npm run test"
+      - run: npm install
+      - run: npm run db:import
+      - run: npm run test
