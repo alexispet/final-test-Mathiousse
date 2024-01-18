@@ -126,7 +126,7 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
 
       - name: Wait for the db service
-        run: ./wait-for-it.sh db:3306 --timeout=60
+        run: sudo ./wait-for-it.sh db:3306 --timeout=60
 
       - name: Run Docker Compose
         run: docker-compose up -d
