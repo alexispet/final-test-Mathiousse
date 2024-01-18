@@ -116,7 +116,7 @@ jobs:
         id: docker_build
 
       - name: Run Docker Compose
-        run: docker-compose up -d
+        run: docker-compose up --build -d
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
@@ -124,7 +124,8 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
-      - name: Wait for db service
+
+      - name: Wait for the mariadb service
         run: ./wait-for-it.sh db:3306 --timeout=60
       - name: Run tests
         run: docker exec web npm run test
