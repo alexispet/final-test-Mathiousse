@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$NODE_ENV" == "development" ]; then
+if [ "$NODE_ENV" = "development" ]; then
   npm install
 fi
 

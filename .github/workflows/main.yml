@@ -41,7 +41,7 @@ jobs:
   lint:
     name: Lint Code Base
     runs-on: ubuntu-latest
-    # needs: dependency-audit PUT THIS BACK IN
+    needs: dependency-audit
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
-    needs: [lint]
+    # needs: [lint] PUT THIS BACK IN
     permissions:
       contents: read
       packages: write
