@@ -124,7 +124,8 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
-
+      - name: Wait for db service
+        run: ./wait-for-it.sh db:3306 --timeout=60
       - name: Run tests
         run: docker exec web npm run test
 
