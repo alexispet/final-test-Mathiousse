@@ -58,7 +58,6 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
-    # if: github.ref_name == 'main'
     permissions:
       contents: read
       packages: write
@@ -66,9 +65,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Convert ref_name to lowercase
+      - name: Convert ref_name and repository to lowercase
         id: convert
-        run: echo "::set-output name=ref_name::$(echo ${{ github.ref_name }} | awk '{print tolower($0)}')"
+        run: echo "::set-output name=repository::$(echo ${{ github.repository }} | awk '{print tolower($0)}')"
 
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -82,4 +81,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ steps.convert.outputs.ref_name }}
+          tags: ghcr.io/${{ steps.convert.outputs.repository }}:${{ github.ref_name }}
