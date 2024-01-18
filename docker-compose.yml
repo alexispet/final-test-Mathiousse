@@ -16,9 +16,9 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
         networks:
             - default
-        depends_on:
-            db:
-                condition: service_healthy
+        # depends_on:
+        #     db:
+        #         condition: service_healthy
 
     db:
         image: mariadb:11.2.2-jammy
