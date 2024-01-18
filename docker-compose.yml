@@ -1,46 +1,52 @@
 services:
-  api:
-      build:
-          context: .
-          dockerfile: Dockerfile
-      ports:
-          - "80:3000"
-      volumes:
-          - .:/app
-      environment:
-          NODE_ENV: development
-          PORT: 3000
-          DB_HOST: db
-          DB_DATABASE: ${DB_DATABASE}
-          DB_USER: ${DB_USER}
-          DB_PASSWORD: ${DB_PASSWORD}
-      networks:
-          - default
-      depends_on:
-          db:
-              condition: service_healthy
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "80:3000"
+        volumes:
+            - .:/app
+        environment:
+            NODE_ENV: development
+            PORT: 3000
+            DB_HOST: db
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+        networks:
+            - default
+        depends_on:
+            db:
+                condition: service_healthy
 
-  db:
-      image: mariadb:11.2.2-jammy
-      restart: always
-      environment:
-          MARIADB_DATABASE: ${DB_DATABASE}
-          MARIADB_USER: ${DB_USER}
-          MARIADB_PASSWORD: ${DB_PASSWORD}
-          MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
-      networks:
-          - default
-      ports:
-          - "3306:3306"
-      volumes:
-          - ./db:/var/lib/mysql
-      healthcheck:
-          test:
-              [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized", ]
-          interval: 1s
-          timeout: 5s
-          retries: 20
-  adminer:
-    image: adminer
-    ports:
-      - 8080:8080
+    db:
+        image: mariadb:11.2.2-jammy
+        restart: always
+        environment:
+            MARIADB_DATABASE: ${DB_DATABASE}
+            MARIADB_USER: ${DB_USER}
+            MARIADB_PASSWORD: ${DB_PASSWORD}
+            MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+        networks:
+            - default
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./db:/var/lib/mysql
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "healthcheck.sh",
+                    "--su-mysql",
+                    "--connect",
+                    "--innodb_initialized",
+                ]
+            interval: 1s
+            timeout: 5s
+            retries: 20
+
+networks:
+    default:
+        driver: bridge
