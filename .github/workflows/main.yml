@@ -1,6 +1,8 @@
 name: CI/CD
 run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.event_name }}
+
 on: [push]
+
 env:
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_USER: ${{ secrets.DB_USER }}
