@@ -112,12 +112,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: run tests
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker compose build
         run: docker compose up -d --wait
-      - run: docker compose exec express npm run test
+
+      - name: Run tests
+        run: docker compose exec app npm run test
+
+      - name: Stop services
+        run: docker compose down
 
   build-and-push-image:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
