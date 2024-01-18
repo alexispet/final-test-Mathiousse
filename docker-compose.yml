@@ -21,7 +21,7 @@ services:
     container_name: cicd-api
     build:
       context: .
-      target: cicd-api
+      dockerfile: Dockerfile
     environment:
       DB_HOST: db
       DB_DATABASE: ${DB_DATABASE}
