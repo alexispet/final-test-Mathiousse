@@ -75,7 +75,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/mathiousse/ci-cd-cesi
+          images: ghcr.io/mathiousse/final-test-Mathiousse
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
