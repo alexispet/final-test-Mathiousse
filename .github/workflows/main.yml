@@ -67,7 +67,7 @@ jobs:
 
       - name: Convert ref_name and repository to lowercase
         id: convert
-        run: echo "::set-output name=repository::$(echo ${{ github.repository }} | awk '{print tolower($0)}')"
+        run: echo "repository=$(echo ${{ github.repository }} | awk '{print tolower($0)}')" >> $GITHUB_ENV # my stupid repo name has a capital letter in it and its throwing a fit
 
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
@@ -81,4 +81,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ steps.convert.outputs.repository }}:${{ github.ref_name }}
+          tags: ghcr.io/${{ env.repository }}:${{ github.ref_name }}
