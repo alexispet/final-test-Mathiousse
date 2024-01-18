@@ -102,52 +102,31 @@ name: CI/CD Pipeline
 
 on: [push]
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-  DB_HOST: db
+  DB_HOST: ${{ secrets.DB_HOST }}
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_NAME: ${{ secrets.DB_NAME }}
   DB_DATABASE: ${{ secrets.DB_DATABASE }}
+  NODE_ENV: development
+  REGISTRY: ghcr.io
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Docker compose build
-        run: docker compose up -d --wait
-
-      - name: Run tests
-        run: docker compose exec app npm run test
-
-      - name: Stop services
-        run: docker compose down
-
-  build-and-push-image:
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: adambirds/docker-compose-action@v1.3.0
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          NODE_ENV: development
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/next
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          compose-file: "./docker-compose.yml"
+          down-flags: "--volumes"
+          services: |
+            api
+            db
+          test-container: api
+          test-command: "npm run test"
