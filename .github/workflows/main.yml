@@ -116,7 +116,7 @@ jobs:
         id: docker_build
 
       - name: Run Docker db Compose # running the db first then everything else works for some reason!!!
-        run: docker-compose up db -d
+        run: docker-compose up -d db
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
@@ -148,11 +148,4 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Display Docker logs for db
-        if: failure()
-        run: docker logs db
-
-      - name: Display Docker logs for web
-        if: failure()
-        run: docker logs web
+        id: docker_push
