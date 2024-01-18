@@ -1,0 +1,26 @@
+version: '3'
+services:
+  web:
+    image: ghcr.io/mathiousse/final-ci-cd:latest
+    labels:
+      - "traefik.http.routers.web.rule=Host(`your-production-url`)"
+    env_file:
+     - .env.prod
+  db:
+    image: mariadb:11.2.2
+    volumes:
+      - './docker/mariadb/data/:/var/lib/mysql/'
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+  traefik:
+    image: traefik:v2.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

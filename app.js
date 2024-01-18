@@ -4,12 +4,13 @@ import mariadb from 'mariadb';
 const app = express();
 let port = process.env.PORT || 3000;
 
+
 // Configurations de la base de données
 const pool = mariadb.createPool({
-  host: 'mariadb',
-  user: 'votre_utilisateur',
-  password: 'votre_mot_de_passe',
-  database: 'votre_base_de_donnees',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   connectionLimit: 5
 });
 
@@ -51,14 +52,14 @@ function findAvailablePort() {
 
 // Lancer le serveur en utilisant le port disponible
 findAvailablePort()
-    .then((availablePort) => {
-      port = availablePort;
-      app.listen(port, () => {
-        console.log(`Serveur en cours d'exécution sur le port ${port}`);
-      });
-    })
-    .catch((err) => {
-      console.error('Erreur lors du démarrage du serveur:', err);
+  .then((availablePort) => {
+    port = availablePort;
+    app.listen(port, () => {
+      console.log(`Serveur en cours d'exécution sur le port ${port}`);
     });
+  })
+  .catch((err) => {
+    console.error('Erreur lors du démarrage du serveur:', err);
+  });
 
 export default app;
