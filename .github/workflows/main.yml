@@ -87,7 +87,7 @@ jobs:
   #         push: true
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
-  build:
+  build-test-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -111,16 +111,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
         id: docker_build
-    outputs:
-      image: ${{ steps.docker_build.outputs.digest }}
-
-  test:
-    needs: [build]
-    environment: development
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: adambirds/docker-compose-action@v1.3.0 # spin up containers to run tests
+      - name: Run tests
+        uses: adambirds/docker-compose-action@v1.3.0
         with:
           compose-file: "./docker-compose.yml"
           down-flags: "--volumes"
@@ -136,17 +128,10 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
-
-  push:
-    needs: [test]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
       - name: Push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
           push: true
-          tags: ${{ needs.build.outputs.image }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
