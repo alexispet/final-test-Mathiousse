@@ -12,30 +12,37 @@ services:
       - "3306:3306"
     healthcheck:
       test: "healthcheck.sh --su-mysql --connect --innodb_initialized"
-      interval: 5s
+      interval: 1m
       timeout: 20s
       retries: 10
+      start_period: 20s
 
   api:
-      build:
-          context: .
-          dockerfile: Dockerfile
-      ports:
-          - "80:3000"
-      volumes:
-          - .:/app
-      environment:
-          NODE_ENV: development
-          PORT: 3000
-          DB_HOST: db
-          DB_DATABASE: ${DB_DATABASE}
-          DB_USER: ${DB_USER}
-          DB_PASSWORD: ${DB_PASSWORD}
-      networks:
-          - default
-      depends_on:
-          db:
-              condition: service_healthy      
+    build:
+      context: .
+      target: api
+    environment:
+      DB_HOST: db
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      NODE_ENV: development
+    healthcheck:
+      test: ["CMD-SHELL", "npm list --depth=0 || exit 1"]
+      interval: 1m
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ".:/app"
+    command: ["npm", "run", "dev"]  
+    
   adminer:
     container_name: adminer
     image: adminer
