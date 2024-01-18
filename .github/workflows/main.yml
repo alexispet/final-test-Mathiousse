@@ -115,7 +115,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
         id: docker_build
 
-      - name: Run Docker db Compose
+      - name: Run Docker db Compose # running the db first then everything else works for some reason!!!
         run: docker-compose up db
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
@@ -125,11 +125,8 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
 
-      # - name: Wait for the db service
-      #   run: ./wait-for-it.sh db:3306 --timeout=60
-
       - name: Run Docker Compose
-        run: docker-compose up
+        run: docker-compose up -d
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
