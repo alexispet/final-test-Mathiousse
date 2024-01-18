@@ -11,8 +11,12 @@ RUN npm install
 FROM build as runner
 
 COPY --from=build /app/node_modules /app/
-COPY ./docker/api/docker-entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
+
+COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
+    ls -la /usr/local/bin/ && \
+    ls -la /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 CMD ["npm","run", "start"]
