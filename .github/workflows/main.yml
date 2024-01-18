@@ -56,7 +56,7 @@ jobs:
 
   build-docker:
     runs-on: ubuntu-latest
-    needs: [test-app, lint]
+    needs: [lint]
     permissions:
       contents: read
       packages: write
