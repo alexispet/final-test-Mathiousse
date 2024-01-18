@@ -82,6 +82,9 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
 
+      - name: List test files
+        run: docker exec cicd-api ls tests
+
       - name: Run tests
         run: docker exec cicd-api npm run test
 
