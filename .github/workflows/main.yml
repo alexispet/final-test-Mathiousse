@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: run tests
-        run: docker compose up -d --wait
+        run: docker compose up --wait
       - run: docker compose exec express npm run test
 
   build-and-push-image:
