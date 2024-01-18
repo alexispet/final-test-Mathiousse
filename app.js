@@ -23,26 +23,7 @@ app.get('/post', async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query('SELECT * FROM posts');
-    result = res.json([
-      {
-        "id": 1,
-        "title": "Premier post",
-        "content": "Contenu du premier post",
-        "createdAt": "2024-01-18T16:43:12.000Z"
-      },
-      {
-        "id": 2,
-        "title": "Deuxième post",
-        "content": "Contenu du deuxième post",
-        "createdAt": "2024-01-18T16:43:12.000Z"
-      },
-      {
-        "id": 3,
-        "title": "Troisième post",
-        "content": "Contenu du troisième post",
-        "createdAt": "2024-01-18T16:43:12.000Z"
-      }
-    ]); // This is what it SHOULD be sending back... // TO BE REPLACED!!!!
+    result = res.json(rows);
   } catch (err) {
     console.error(err);
     result = res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
