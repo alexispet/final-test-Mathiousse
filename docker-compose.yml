@@ -13,8 +13,8 @@ services:
     healthcheck:
       test: "healthcheck.sh --su-mysql --connect --innodb_initialized"
       interval: 1s
-      timeout: 5s
-      retries: 20
+      timeout: 20s
+      retries: 30
 
   api:
       build:
