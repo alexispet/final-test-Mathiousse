@@ -126,7 +126,13 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
 
       - name: Wait for the db service
-        run: sudo chmod +x wait-for-it.sh && sudo ./wait-for-it.sh db:3306 --timeout=60
+        run: sudo chmod +x wait-for-it.sh && sudo ./wait-for-it.sh db:3306 --timeout=90
+
+      - name: get the db container id
+        run: export DB_CONTAINER_ID=$(docker ps -aqf "name=db")
+
+      - name: get logs from db container
+        run: docker logs $DB_CONTAINER_ID
 
       - name: Run Docker Compose
         run: docker-compose up -d
