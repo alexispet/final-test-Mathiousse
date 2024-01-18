@@ -135,3 +135,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Display Docker logs for db
+        if: failure()
+        run: docker logs db
+      - name: Display Docker logs for web
+        if: failure()
+        run: docker logs web
