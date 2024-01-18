@@ -43,14 +43,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: adambirds/docker-compose-action@v1.3.0
+      - uses: adambirds/docker-compose-action@v1.3.0 # spin up containers to run tests
         with:
           compose-file: "./docker-compose.yml"
           down-flags: "--volumes"
           services: |
-            node
-            mariadb
-          test-container: node
+            web
+            db
+          test-container: web
           test-command: "npm run test"
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
