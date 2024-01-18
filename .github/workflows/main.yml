@@ -116,7 +116,7 @@ jobs:
         id: docker_build
 
       - name: Run Docker Compose
-        run: docker-compose up --build -d
+        run: docker-compose up
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
