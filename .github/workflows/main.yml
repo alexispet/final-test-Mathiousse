@@ -52,6 +52,7 @@ jobs:
             db
           test-container: web
           test-command: "npm run test"
+          up-flags: "--build"
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: "yes"
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
