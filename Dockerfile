@@ -1,8 +1,8 @@
 FROM node:20-alpine as build
 
-WORKDIR /app
+COPY . /app
 
-COPY package*.json ./
+WORKDIR /app
 
 RUN npm install
 
@@ -14,11 +14,10 @@ LABEL org.containers.images.source https://github.com/alexispet/final-test-mathi
 
 WORKDIR /app
 
-COPY --from=build /app/package.json .
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json .
+COPY --from=build /app/database ./database
 COPY --from=build /app/app.js .
-COPY --from=build /app/database/init-db.js ./database/
-COPY --from=build /app/tests ./tests
 
 COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint

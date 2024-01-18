@@ -125,7 +125,6 @@ jobs:
           test-container: api
           test-command: "npm run test"
         env:
-          MYSQL_RANDOM_ROOT_PASSWORD: ${{ secrets.MYSQL_RANDOM_ROOT_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
