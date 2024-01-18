@@ -9,6 +9,7 @@ env:
   DB_DATABASE: ${{ secrets.DB_DATABASE }}
   NODE_ENV: development
   REGISTRY: ghcr.io
+  IMAGE_NAME: cicd-cesi
 
 jobs:
   dependency-audit:
@@ -71,13 +72,13 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/express
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
