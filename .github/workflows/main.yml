@@ -125,6 +125,6 @@ jobs:
         with:
           compose-file: "./docker-compose.yml"
           down-flags: "--volumes"
-          services: cicd-api
-          test-container: cicd-api
+          services: api
+          test-container: api
           test-command: "npm run test"
