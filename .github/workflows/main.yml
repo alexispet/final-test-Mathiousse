@@ -1,5 +1,5 @@
 name: CI/CD
-run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.event_name }} (this is a copilot generated name)
+run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.event_name }}
 on: [push]
 env:
   REGISTRY: ghcr.io
@@ -9,15 +9,26 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_DATABASE: ${{ secrets.DB_DATABASE }}
 jobs:
-  test:
-    environment: dev
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: run tests
-        run: docker compose up --wait
-      - run: docker compose exec express npm run test
-
+      - uses: adambirds/docker-compose-action@v1.3.0
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          NODE_ENV: development
+        with:
+          compose-file: "./docker-compose.yml"
+          down-flags: "--volumes"
+          services: |
+            api
+            db
+          test-container: api
+          test-command: "npm run test"
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
