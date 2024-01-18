@@ -42,7 +42,7 @@ app.get('/post', async (req, res) => {
         "content": "Contenu du troisième post",
         "createdAt": "2024-01-18T16:43:12.000Z"
       }
-    ]);
+    ]); // This is what it SHOULD be sending back... // TO BE REPLACED!!!!
   } catch (err) {
     console.error(err);
     result = res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
