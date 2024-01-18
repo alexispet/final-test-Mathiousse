@@ -82,11 +82,14 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
 
-      - name: List test files
-        run: docker exec cicd-api ls tests
-
       - name: Run tests
         run: docker exec cicd-api npm run test
+
+      - name: logging
+        run: docker logs cicd-api
+
+      - name: logging
+        run: docker logs db
 
       - name: Push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
