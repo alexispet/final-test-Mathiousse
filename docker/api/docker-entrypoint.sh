@@ -1,11 +1,11 @@
 #!/bin/sh
 
-if [ "$NODE_ENV" = "development" ]; then
+if [ $NODE_ENV == "development" ]; then
+  echo "executing npm install in dev mode"
   npm install
 fi
 
-echo "DB_HOST is set to $DB_HOST"
-
+# todo : do not run migration if already done
 npm run db:import
 
 exec "$@"
