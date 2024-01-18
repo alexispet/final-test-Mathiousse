@@ -24,7 +24,6 @@ services:
 
   web:
     container_name: cicd-api
-    env_file: .env
     build:
       context: .
       target: cicd-api
