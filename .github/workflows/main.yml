@@ -87,7 +87,7 @@ jobs:
   #         push: true
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
-  build-test-push:
+  build-test-push: # squished them all together to save some time
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
