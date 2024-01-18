@@ -113,7 +113,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - uses: adambirds/docker-compose-action@v1.3.0
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
