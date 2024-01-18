@@ -19,6 +19,9 @@ services:
 
   web:
     container_name: cicd-api
+    build:
+      context: .
+      target: cicd-api
     environment:
       DB_HOST: db
       DB_DATABASE: ${DB_DATABASE}
