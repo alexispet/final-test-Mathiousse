@@ -18,6 +18,7 @@ COPY --from=build /app/package.json .
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/app.js .
 COPY --from=build /app/database/init-db.js ./database/
+COPY --from=build /app/tests ./tests
 
 COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
