@@ -1,11 +1,5 @@
 import mariadb from "mariadb";
 
-console.log("init-db.js", {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  port: process.env.DB_PORT,
-  database: process.env.DB_DATABASE,
-})
 // Configuration de la base de données
 const pool = mariadb.createPool({
   host: process.env.DB_HOST,
