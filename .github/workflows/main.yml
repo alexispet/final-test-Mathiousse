@@ -82,17 +82,8 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PORT: ${{ secrets.DB_PORT }}
 
-      - name: Wait for web service to be ready
-        run: |
-          echo "Waiting for web service..."
-          docker ps -a
-          while ! docker exec web npm run healthcheck; do
-            sleep 1
-            docker ps -a
-          done
-
       - name: Run tests
-        run: docker exec web npm run test
+        run: docker exec cicd-api npm run test
 
       - name: Push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
