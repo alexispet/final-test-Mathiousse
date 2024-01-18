@@ -20,16 +20,18 @@ app.get('/', async (req, res) => {
 
 app.get('/post', async (req, res) => {
   let conn;
+  let result;
   try {
     conn = await pool.getConnection();
     const rows = await conn.query('SELECT * FROM posts');
-    res.json(rows);
+    result = res.json(rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
+    result = res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
   } finally {
-    if (conn) return conn.end();
+    if (conn) conn.end();
   }
+  return result;
 });
 
 function findAvailablePort() {
