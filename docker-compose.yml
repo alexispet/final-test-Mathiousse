@@ -34,12 +34,12 @@ services:
             - "3306:3306"
         volumes:
             - ./db:/var/lib/mysql
-        healthcheck:
-            test:
-                [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized", ]
-            interval: 1s
-            timeout: 20s
-            retries: 40
+        # healthcheck:
+        #     test:
+        #         [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized", ]
+        #     interval: 1s
+        #     timeout: 20s
+        #     retries: 40
 
 networks:
     default:
