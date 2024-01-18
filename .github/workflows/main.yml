@@ -17,6 +17,8 @@ jobs:
           node-version: "20"
       - name: Install dependencies
         run: npm ci
+      - name: import db
+        run: npm run db:import
       - name: Run tests
         run: npm test
 
