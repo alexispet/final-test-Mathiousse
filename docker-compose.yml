@@ -1,16 +1,45 @@
-version: '3'
-services:
-  web:
-    build: .
-    ports:
-     - "3000:3000"
-    volumes:
-     - .:/app
-    env_file:
-     - .env
+services: 
   db:
-    image: mariadb:11.2.2
-    volumes:
-      - './docker/mariadb/data/:/var/lib/mysql/'
+    container_name: database
+    image: mariadb
+    restart: always
+    ports:
+      - ${DB_PORT}:${DB_PORT}
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MYSQL_TCP_PORT: ${DB_PORT}
+    volumes:
+      - ./docker/mariadb/data:/var/lib/mysql/
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "db", "-u${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+
+  web:
+    container_name: cicd-api
+    env_file: .env
+    build:
+      context: .
+      target: cicd-api
+    environment:
+      NODE_ENV: development
+    depends_on:
+      db: 
+        condition: service_healthy
+    image: ghcr.io/alexispet/final-test-mathiousse/api:develop
+    ports:
+      - 3000:3000 
+  
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+
+

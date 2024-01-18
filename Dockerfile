@@ -8,15 +8,20 @@ RUN npm install
 
 COPY . .
 
-FROM node:20-alpine
+FROM node:20-alpine as cicd-api
+
+LABEL org.containers.images.source https://github.com/alexispet/final-test-mathiousse
 
 WORKDIR /app
 
-COPY --from=build /app .
+COPY --from=build /app/package.json .
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/app.js .
+COPY --from=build /app/database/init-db.js ./database/
 
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["sh", "/usr/local/bin/docker-entrypoint"]
 
 EXPOSE 3000
 CMD ["npm", "start"]
