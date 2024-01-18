@@ -83,4 +83,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/mathiousse:${{ github.ref_name }}
+          tags: ghcr.io/${{ env.repository }}:${{ github.ref_name }}
