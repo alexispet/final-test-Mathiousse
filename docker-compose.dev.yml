@@ -1,6 +1,6 @@
 version: '3'
 services:
-  api:
+  api-dev:
     image: docker.io/mathioussee/final-test-mathiousse:ddevelopment 
     container_name: api_dev
     ports:
@@ -14,7 +14,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
-  db:
+  db-dev:
     image: mariadb:11.2.2-jammy
     restart: always
     environment:
