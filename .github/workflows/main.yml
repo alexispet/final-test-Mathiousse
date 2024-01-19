@@ -122,7 +122,7 @@ jobs:
         run: pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
+        run: ansible-playbook ansible/playbook.yml -i ansible/inventory.ini --private-key ${{ secrets.SSH_KEY }} -u ${{ secrets.SSH_USER }}
 
   notify:
     needs: [deploy]
