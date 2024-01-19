@@ -124,9 +124,9 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
+          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
   notify:
     needs: [deploy]
