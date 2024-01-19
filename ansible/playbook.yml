@@ -1,12 +1,14 @@
+- name: Install docker
 - hosts: web
   become: true
   tasks:
     - name: Install Docker
-      apt:
+      ansible.builtin.apt:
         name: docker.io
         state: present
         update_cache: yes
     - name: Copy docker-compose files
-      copy:
-        src: ./path/to/your/docker-compose/file/on/your/local/machine
-        dest: /path/to/destination/on/your/server
+      ansible.builtin.copy:
+        src: ./docker-compose.yml
+        dest: /
+        mode: "0644"
