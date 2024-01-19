@@ -111,35 +111,28 @@ jobs:
     # if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Execute deployment script
-        uses: appleboy/ssh-action@master
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd final-test-Mathiousse
-            git pull
-            ./deploy-dev.sh
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          cd ~/final-test-Mathiousse && \
+          git pull && \
+          sudo sh deploy.sh"
 
   deploy-prod:
     # if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Execute deployment script
-        uses: appleboy/ssh-action@master
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
-          host: ${{ secrets.SSH_ }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd final-test-Mathiousse
-            git pull
-            ./deploy-prod.sh
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          cd ~/final-test-Mathiousse && \
+          git pull && \
+          sudo sh deploy.sh"
+
   notify:
     needs: [deploy-prod]
     if: success()
