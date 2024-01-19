@@ -118,7 +118,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
           cd ~/final-test-Mathiousse && \
           git pull && \
-          sudo sh deploy.sh"
+          sudo sh deploy-dev.sh"
 
   deploy-prod:
     # if: github.ref == 'refs/heads/main'
@@ -131,7 +131,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
           cd ~/final-test-Mathiousse && \
           git pull && \
-          sudo sh deploy.sh"
+          sudo sh deploy-prod.sh"
 
   notify:
     needs: [deploy-prod]
