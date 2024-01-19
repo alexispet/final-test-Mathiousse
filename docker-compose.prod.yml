@@ -3,7 +3,7 @@ services:
   api:
     image: docker.io/mathioussee/final-test-mathiousse:main
     ports:
-      - "80:3000"
+      - "3000:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -27,7 +27,7 @@ services:
       - "3308:3308"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.yourservice.rule=Host(${ec2-44-211-162-238.compute-1.amazonaws.com})
+      - traefik.http.routers.yourservice.rule=Host(${https://ec2-44-211-162-238.compute-1.amazonaws.com/})
       - traefik.http.routers.yourservice.entrypoints=websecure
       - traefik.http.routers.yourservice.tls.certresolver=myresolver
 
@@ -52,6 +52,7 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 8081:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./letsencrypt:/letsencrypt
