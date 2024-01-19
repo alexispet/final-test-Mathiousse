@@ -107,7 +107,7 @@ jobs:
             ${{ secrets.AWS_URL }}
           uploadArtifacts: true
   deploy:
-    needs: [build-and-push]
+    # needs: [build-and-push]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -130,7 +130,7 @@ jobs:
           chmod 600 .ssh/key
       - name: run exporters playbook
         run: |
-          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml
+          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user admin
   notify:
     needs: [deploy]
     if: success()
