@@ -130,7 +130,7 @@ jobs:
           chmod 600 .ssh/key
       - name: run the actual playbook
         run: |
-          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user admin -e 'ansible_ssh_extra_args=-o StrictHostKeyChecking=no'
+          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user admin -e 'ansible_ssh_extra_args="-o StrictHostKeyChecking=no"'
   notify:
     needs: [deploy]
     if: success()
