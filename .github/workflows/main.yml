@@ -122,25 +122,48 @@ jobs:
         run: pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook ansible/playbook.yml -i ansible/inventory.ini --private-key ${{ secrets.SSH_KEY }} -u ${{ secrets.SSH_USER }}
-
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
+          ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
   notify:
     needs: [deploy]
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord message
+      - name: if success
+        if: success()
+        run: echo "success"
+      - name: if failure
+        if: failure()
+        run: echo "failure"
+
+      - name: notify-success
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
           message: "Deployment has been done successfully."
 
-  notify-failure:
-    needs: [deploy]
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Discord message
+      - name: notify-failure
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
           message: "Deployment has failed... :("
+
+  #     - name: Send Discord message
+  #       uses: containrrr/shoutrrr-action@v1
+  #       with:
+  #         url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+  #         message: "Deployment has been done successfully."
+
+  # notify-failure:
+  #   needs: [deploy]
+  #   if: failure()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Send Discord message
+  #       uses: containrrr/shoutrrr-action@v1
+  #       with:
+  #         url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+  #         message: "Deployment has failed... :("
