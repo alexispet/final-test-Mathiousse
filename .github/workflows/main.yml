@@ -66,7 +66,7 @@ jobs:
       - name: Lint Code Base
         run: npm run lint # Use the appropriate command to run ESLint
   build-and-push:
-    # needs: [tests] put back
+    needs: [tests]
     name: Push Docker image to Docker Hub # using dockerhub bc i had problems with ghcr
     runs-on: ubuntu-latest
     steps:
