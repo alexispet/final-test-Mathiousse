@@ -1,0 +1,35 @@
+version: '3'
+services:
+  api:
+    image: ${{ env.REGISTRY }}/mathioussee/final-test-mathiousse:latest
+    ports:
+      - "8080:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: db
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+  db:
+    image: mariadb:11.2.2-jammy
+    restart: always
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+    ports:
+      - "3309:3308"
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+networks:
+  default:
+    driver: bridge

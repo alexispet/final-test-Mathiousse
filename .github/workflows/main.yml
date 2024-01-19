@@ -106,41 +106,39 @@ jobs:
           urls: |
             ${{ secrets.AWS_URL }}
           uploadArtifacts: true
-  deploy:
+  deploy-dev:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Execute deployment script
+        uses: appleboy/ssh-action@master
         with:
-          python-version: "3.x"
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd final-test-Mathiousse
+            git pull
+            ./deploy-dev.sh
 
-      - name: Install Ansible
-        run: pip install ansible
-
-      - name: Copy docker-compose.prod.yml to server
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-        run: |
-          mkdir .ssh
-          echo "$SSH_KEY" > .ssh/key
-          chmod 600 .ssh/key
-          scp -i .ssh/key docker-compose.prod.yml ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST }}:~/docker-compose.prod.yml -i ${{secrets.SSH_KEY}} -o StrictHostKeyChecking=no
-
-      - name: Run docker-compose.prod.yml on server
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-        run: |
-          ssh -i .ssh/key ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST }} -i ${{secrets.SSH_KEY}} -o StrictHostKeyChecking=no " docker-compose -f docker-compose.prod.yml up -d"
-
-      # - name: Run Ansible Playbook
-      #   env:
-      #     SSH_KEY: ${{ secrets.SSH_KEY }}
-      #   run: |
-      #     ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user ${{secrets.SSH_USER}} -e 'ansible_ssh_extra_args="-o StrictHostKeyChecking=no"'
-
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Execute deployment script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd final-test-Mathiousse
+            git pull
+            ./deploy-prod.sh
   notify:
     needs: [deploy]
     if: success()
