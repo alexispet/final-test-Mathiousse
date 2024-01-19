@@ -2,10 +2,20 @@ name: ansible
 run-name: running ansible wizardry
 
 on:
-  push:
-    branches:
-      - main
-      - development
+  workflow_dispatch:
+    inputs:
+      ssh_host:
+        description: "SSH Host"
+        required: true
+        default: ${{ secrets.SSH_HOST }}
+      ssh_key:
+        description: "SSH Key"
+        required: true
+        default: ${{ secrets.SSH_KEY }}
+      discord_webhook:
+        description: "Discord Webhook"
+        required: true
+        default: ${{ secrets.DISCORD_WEBHOOK }}
 
 jobs:
   ansible:

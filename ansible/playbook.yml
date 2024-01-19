@@ -2,6 +2,7 @@
 - name: Install docker
   hosts: web
   become: true
+
   tasks:
     - name: Install Docker
       ansible.builtin.shell: |
