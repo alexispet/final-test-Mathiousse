@@ -97,15 +97,14 @@ jobs:
   lighthouse:
     needs: [tests]
     if: |
-      github.event_name == 'schedule' || github.event_name == 'push'
-
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
       - name: Audit URLs using Lighthouse
         uses: treosh/lighthouse-ci-action@v7
         with:
           urls: |
-            http://localhost
+            ${{ secrets.AWS_URL }}
           uploadArtifacts: true
 
   notify:
