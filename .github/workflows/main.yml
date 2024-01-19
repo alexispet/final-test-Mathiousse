@@ -95,7 +95,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   lighthouse:
-    needs: [deploy]
+    needs: [deploy-prod]
     if: |
       github.event_name == 'schedule'
     runs-on: ubuntu-latest
@@ -140,7 +140,7 @@ jobs:
             git pull
             ./deploy-prod.sh
   notify:
-    needs: [deploy]
+    needs: [deploy-prod]
     if: success()
     runs-on: ubuntu-latest
     steps:
@@ -151,7 +151,7 @@ jobs:
           message: "Deployment has been done successfully. @mathioussee"
 
   notify-failure:
-    needs: [deploy]
+    needs: [deploy-prod]
     if: failure()
     runs-on: ubuntu-latest
     steps:
