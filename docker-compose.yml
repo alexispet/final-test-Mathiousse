@@ -1,48 +1,46 @@
-services: 
-  db:
-    container_name: database
-    image: mariadb
-    restart: always
-    ports:
-      - ${DB_PORT}:${DB_PORT}
-    environment:
-      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
-      MARIADB_USER: ${DB_USER}
-      MARIADB_PASSWORD: ${DB_PASSWORD}
-      MARIADB_DATABASE: ${DB_DATABASE}
-      MYSQL_TCP_PORT: ${DB_PORT}
-      MARIADB_MYSQL_LOCALHOST_USER: 1
-      MARIADB_MYSQL_LOCALHOST_GRANTS: USAGE
-    volumes:
-      - ./docker/mariadb/data:/var/lib/mysql/
-    healthcheck:
-        test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
-        start_period: 5s
-        start_interval: 10s
-        interval: 5s
-        timeout: 5s
-        retries: 3
+services:
+    api:
+        build:
+            context: .
+        ports:
+            - "80:3000"
+        volumes:
+            - .:/app
+        environment:
+            NODE_ENV: development
+            PORT: 3000
+            DB_HOST: db
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+        networks:
+            - default
+        # depends_on:
+        #     db:
+        #         condition: service_healthy
 
-  web:
-    container_name: cicd-api
-    env_file: .env
-    build:
-      context: .
-      target: cicd-api
-    environment:
-      NODE_ENV: development
-    depends_on:
-      db: 
-        condition: service_healthy
-    image: ghcr.io/alexispet/final-test-mathiousse/api:develop
-    ports:
-      - 3000:3000 
-  
-  adminer:
-    container_name: adminer
-    image: adminer
-    restart: always
-    ports:
-      - 8081:8080
+    db:
+        image: mariadb:11.2.2-jammy
+        restart: always
+        environment:
+            MARIADB_DATABASE: ${DB_DATABASE}
+            MARIADB_USER: ${DB_USER}
+            MARIADB_PASSWORD: ${DB_PASSWORD}
+            MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+        networks:
+            - default
+        ports:
+            - "3308:3308"
+        volumes:
+            - ./db:/var/lib/mysql
+        # healthcheck:
+        #     test:
+        #         [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized", ]
+        #     interval: 1s
+        #     timeout: 20s
+        #     retries: 40 
+        # so for some reason if i put the healthcheck everything breaks on github actions so find a fix:)
 
-
+networks:
+    default:
+        driver: bridge

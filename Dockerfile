@@ -1,28 +1,20 @@
-FROM node:20-alpine as build
+FROM node:20 as build
+COPY . /app
 
 WORKDIR /app
 
-COPY package*.json ./
+EXPOSE 3000
 
 RUN npm install
 
-COPY . .
+FROM build as runner
 
-FROM node:20-alpine as cicd-api
+COPY --from=build /app/node_modules /app/
 
-LABEL org.containers.images.source https://github.com/alexispet/final-test-mathiousse
+COPY docker-compose.prod.yml /app/docker-compose.prod.yml
 
-WORKDIR /app
+COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 
-COPY --from=build /app/package.json .
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/app.js .
-COPY --from=build /app/database/init-db.js ./database/
-
-COPY docker/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
-ENTRYPOINT ["sh", "/usr/local/bin/docker-entrypoint"]
-
-EXPOSE 3000
-CMD ["npm", "start"]
-
+CMD ["npm","run", "start"]

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "test": "mocha tests/**/*.test.js --exit",
-    "db:import": "node database/init-db.js"
+    "db:import": "node database/init-db.js",
+    "lint": "eslint ."
   },
   "type": "module",
   "author": "",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
+    "lint": "^0.8.19",
     "mariadb": "^3.2.3"
   },
   "devDependencies": {

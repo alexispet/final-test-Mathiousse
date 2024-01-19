@@ -1,0 +1,16 @@
+---
+- name: Install docker
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install Docker
+      ansible.builtin.shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sudo sh get-docker.sh
+
+    - name: Copy docker-compose files
+      ansible.builtin.copy:
+        src: /docker-compose.yml
+        dest: /
+        mode: "0644"

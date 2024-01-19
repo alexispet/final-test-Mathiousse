@@ -1,26 +1,62 @@
 version: '3'
 services:
-  web:
-    image: ghcr.io/mathiousse/final-ci-cd:latest
-    labels:
-      - "traefik.http.routers.web.rule=Host(`your-production-url`)"
-    env_file:
-     - .env.prod
-  db:
-    image: mariadb:11.2.2
-    volumes:
-      - './docker/mariadb/data/:/var/lib/mysql/'
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-  traefik:
-    image: traefik:v2.0
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+  api:
+    image: ${{ env.REGISTRY }}/mathioussee/final-test-mathiousse:latest
     ports:
-      - "80:80"
-      - "8080:8080"
+      - "80:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+  db:
+    image: mariadb:11.2.2-jammy
+    restart: always
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - default
+    ports:
+      - "3308:3308"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.yourservice.rule=Host(${IPV4_DNS})
+      - traefik.http.routers.yourservice.entrypoints=websecure
+      - traefik.http.routers.yourservice.tls.certresolver=myresolver
+
+  watchtower:
+    image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+
+  traefik:
+    image: traefik:v2.11
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=matcap31@gmail.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt
+
+
+networks:
+  default:
+    driver: bridge

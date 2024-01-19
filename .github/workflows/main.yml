@@ -1,67 +1,172 @@
-name: CI/CD Pipeline
+name: CI/CD
+run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.event_name }}
 
 on:
   push:
-    branches:
-      - main
+  schedule:
+    - cron: "0 0 * * *"
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_DATABASE: ${{ secrets.DB_DATABASE }}
+  NODE_ENV: development
+  REGISTRY: docker.io
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install dependencies
-        run: npm ci
-      - name: Run eslint
-        run: npx eslint .
-
-  audit:
+  dependency-audit:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: npm audit --audit-level=high
 
-  test:
-    name: test
+  tests:
+    needs: [dependency-audit, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm install
-      - run: npm test
-
-  build-and-push-image:
-    needs: [test]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      - uses: adambirds/docker-compose-action@v1.3.0
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          NODE_ENV: development
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          compose-file: "./docker-compose.yml"
+          down-flags: "--volumes"
+          services: |
+            api
+            db
+          test-container: api
+          test-command: "npm run test"
+
+  lint:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    needs: dependency-audit
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16" # Use the version of Node.js that you prefer
+
+      - name: Install Dependencies
+        run: npm ci # Use the appropriate command to install your project's dependencies
+
+      - name: Lint Code Base
+        run: npm run lint # Use the appropriate command to run ESLint
+  build-and-push:
+    # needs: [tests] put back
+    name: Push Docker image to Docker Hub # using dockerhub bc i had problems with ghcr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api
+          images: ${{ env.REGISTRY }}/mathioussee/final-test-mathiousse
+
       - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  lighthouse:
+    needs: [deploy-prod]
+    if: |
+      github.event_name == 'schedule'
+      || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v7
+        with:
+          urls: |
+            ${{ secrets.AWS_URL }}
+          uploadArtifacts: true
+  deploy-dev:
+    # if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          cd ~/final-test-Mathiousse && \
+          git pull && \
+          sudo sh deploy.sh"
+
+  deploy-prod:
+    # if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          cd ~/final-test-Mathiousse && \
+          git pull && \
+          sudo sh deploy.sh"
+
+  notify:
+    needs: [deploy-prod]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: notify-success
+        uses: containrrr/shoutrrr-action@v1
+        with:
+          url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+          message: "Deployment has been done successfully. @mathioussee"
+
+  notify-failure:
+    needs: [deploy-prod]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: notify-failure
+        uses: containrrr/shoutrrr-action@v1
+        with:
+          url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+          message: "Deployment has failed... :( @mathioussee"
+  #     - name: Send Discord message
+  #       uses: containrrr/shoutrrr-action@v1
+  #       with:
+  #         url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+  #         message: "Deployment has been done successfully."
+
+  # notify-failure:
+  #   needs: [deploy]
+  #   if: failure()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Send Discord message
+  #       uses: containrrr/shoutrrr-action@v1
+  #       with:
+  #         url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
+  #         message: "Deployment has failed... :("

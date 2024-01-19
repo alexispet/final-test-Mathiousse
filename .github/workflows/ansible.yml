@@ -1,0 +1,34 @@
+name: ansible
+run-name: running ansible wizardry
+
+on: workflow_dispatch
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Run Ansible Playbook
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          ansible-playbook -i inventory.ini playbook.yml
+
+      - name: Send Discord message
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "Ansible playbook has been run successfully."
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
