@@ -2,7 +2,6 @@ name: ansible
 run-name: running ansible wizardry
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
@@ -24,7 +23,7 @@ jobs:
         run: ansible-playbook -i inventory.ini playbook.yml
 
       - name: Send Discord message
-        uses: Ilshidur/action-discord@2.0.1
+        uses: Ilshidur/action-discord@0.3.2
         with:
           args: "Ansible playbook has been run successfully."
         env:

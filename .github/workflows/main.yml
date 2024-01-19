@@ -93,8 +93,8 @@ jobs:
   lighthouse:
     needs: [tests]
     if: |
-      github.event_name == 'schedule'
-      github.event_name == 'push'
+      github.event_name == 'schedule' || github.event_name == 'push'
+
     runs-on: ubuntu-latest
     steps:
       - name: Audit URLs using Lighthouse
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord message
-        uses: Ilshidur/action-discord@2.0.1
+        uses: Ilshidur/action-discord@0.3.2
         with:
           args: "Deployment has been done successfully."
         env:
