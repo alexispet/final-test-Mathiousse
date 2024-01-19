@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord message
-        uses: containrrr/shoutrrr-action@v2
+        uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
           message: "Deployment has been done successfully."
