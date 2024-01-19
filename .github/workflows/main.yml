@@ -1,7 +1,10 @@
 name: CI/CD
 run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.event_name }}
 
-on: [push]
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * *"
 
 env:
   DB_HOST: ${{ secrets.DB_HOST }}
@@ -14,12 +17,14 @@ env:
 
 jobs:
   dependency-audit:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: npm audit --audit-level=high
 
   tests:
+    needs: [dependency-audit, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +61,8 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
-  upload-artifact:
+  build-and-push:
+    needs: [tests]
     name: Push Docker image to Docker Hub # using dockerhub bc i had problems with ghcr
     runs-on: ubuntu-latest
     steps:
@@ -83,3 +89,28 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  lighthouse:
+    needs: [tests]
+    if: |
+      github.event_name == 'schedule'
+      github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v7
+        with:
+          urls: |
+            http://localhost
+          uploadArtifacts: true
+
+  notify:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord message
+        uses: Ilshidur/action-discord@2.0.1
+        with:
+          args: "Deployment has been done successfully."
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

@@ -1,0 +1,31 @@
+name: ansible
+run-name: running ansible wizardry
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook -i inventory.ini playbook.yml
+
+      - name: Send Discord message
+        uses: Ilshidur/action-discord@2.0.1
+        with:
+          args: "Ansible playbook has been run successfully."
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

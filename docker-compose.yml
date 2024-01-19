@@ -38,7 +38,8 @@ services:
         #         [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized", ]
         #     interval: 1s
         #     timeout: 20s
-        #     retries: 40
+        #     retries: 40 
+        # so for some reason if i put the healthcheck everything breaks on github actions so find a fix:)
 
 networks:
     default:
