@@ -107,7 +107,6 @@ jobs:
             ${{ secrets.AWS_URL }}
           uploadArtifacts: true
   deploy:
-    # needs: [build-and-push]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -121,17 +120,27 @@ jobs:
       - name: Install Ansible
         run: pip install ansible
 
-      - name: Run Ansible Playbook
+      - name: Copy docker-compose.prod.yml to server
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           mkdir .ssh
           echo "$SSH_KEY" > .ssh/key
           chmod 600 .ssh/key
+          scp -i .ssh/key docker-compose.prod.yml ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST }}:~/docker-compose.prod.yml
 
-      - name: run the actual playbook
+      - name: Run docker-compose.prod.yml on server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user admin -e 'ansible_ssh_extra_args="-o StrictHostKeyChecking=no"'
+          ssh -i .ssh/key ${{secrets.SSH_USER}}@${{ secrets.SSH_HOST }} " docker-compose -f docker-compose.prod.yml up -d"
+
+      # - name: Run Ansible Playbook
+      #   env:
+      #     SSH_KEY: ${{ secrets.SSH_KEY }}
+      #   run: |
+      #     ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user ${{secrets.SSH_USER}} -e 'ansible_ssh_extra_args="-o StrictHostKeyChecking=no"'
+
   notify:
     needs: [deploy]
     if: success()
