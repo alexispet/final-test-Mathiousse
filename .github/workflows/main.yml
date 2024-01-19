@@ -128,6 +128,11 @@ jobs:
           mkdir .ssh
           echo "$SSH_KEY" > .ssh/key
           chmod 600 .ssh/key
+      - name: Update system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+
       - name: run the actual playbook
         run: |
           ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml --private-key .ssh/key --user admin -e 'ansible_ssh_extra_args="-o StrictHostKeyChecking=no"'
@@ -140,7 +145,7 @@ jobs:
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
-          message: "Deployment has been done successfully."
+          message: "Deployment has been done successfully. @mathioussee"
 
   notify-failure:
     needs: [deploy]
@@ -151,7 +156,7 @@ jobs:
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
-          message: "Deployment has failed... :("
+          message: "Deployment has failed... :( @mathioussee"
   #     - name: Send Discord message
   #       uses: containrrr/shoutrrr-action@v1
   #       with:
