@@ -1,7 +1,7 @@
 version: '3'
 services:
   api:
-    image: docker.io/mathioussee/final-test-mathiousse:latest
+    image: docker.io/mathioussee/final-test-mathiousse:main
     ports:
       - "80:3000"
     environment:
@@ -27,7 +27,7 @@ services:
       - "3308:3308"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.yourservice.rule=Host(${IPV4_DNS})
+      - traefik.http.routers.yourservice.rule=Host(${ec2-44-211-162-238.compute-1.amazonaws.com})
       - traefik.http.routers.yourservice.entrypoints=websecure
       - traefik.http.routers.yourservice.tls.certresolver=myresolver
 
