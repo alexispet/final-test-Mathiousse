@@ -1,7 +1,7 @@
 version: '3'
 services:
   api:
-    image: ${{ env.REGISTRY }}/mathioussee/final-test-mathiousse:latest
+    image: ${ env.REGISTRY }/mathioussee/final-test-mathiousse:latest
     ports:
       - "8080:3000"
     environment:
