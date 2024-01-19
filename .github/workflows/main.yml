@@ -56,7 +56,6 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
-
   upload-artifact:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
