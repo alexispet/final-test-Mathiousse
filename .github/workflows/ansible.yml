@@ -2,7 +2,10 @@ name: ansible
 run-name: running ansible wizardry
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - development
 
 jobs:
   ansible:
