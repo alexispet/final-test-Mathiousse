@@ -95,7 +95,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   lighthouse:
-    needs: [tests]
+    needs: [deploy]
     if: |
       github.event_name == 'schedule'
     runs-on: ubuntu-latest
