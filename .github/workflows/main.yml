@@ -127,9 +127,10 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-          ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
+          ansible-playbook ansible/playbook.yml -i ansible/inventory.ini -v
   notify:
     needs: [deploy]
+    if: success() || failure()
     runs-on: ubuntu-latest
     steps:
       - name: if success
