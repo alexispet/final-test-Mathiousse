@@ -13,7 +13,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
-      
+
   db:
     image: mariadb:11.2.2-jammy
     restart: always
@@ -28,7 +28,7 @@ services:
       - "3308:3308"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.yourservice.rule=Host(${https://ec2-44-211-162-238.compute-1.amazonaws.com/})
+      - traefik.http.routers.yourservice.rule=Host(https://ec2-44-211-162-238.compute-1.amazonaws.com/)
       - traefik.http.routers.yourservice.entrypoints=websecure
       - traefik.http.routers.yourservice.tls.certresolver=myresolver
 
