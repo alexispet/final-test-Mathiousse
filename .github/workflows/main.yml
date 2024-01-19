@@ -128,10 +128,6 @@ jobs:
           mkdir .ssh
           echo "$SSH_KEY" > .ssh/key
           chmod 600 .ssh/key
-      - name: Update system packages
-        run: |
-          sudo apt-get update
-          sudo apt-get upgrade
 
       - name: run the actual playbook
         run: |
