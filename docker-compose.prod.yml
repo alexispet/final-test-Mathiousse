@@ -13,6 +13,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - default
+      
   db:
     image: mariadb:11.2.2-jammy
     restart: always
