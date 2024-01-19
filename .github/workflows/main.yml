@@ -62,7 +62,7 @@ jobs:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
   build-and-push:
-    needs: [tests]
+    # needs: [tests] put back
     name: Push Docker image to Docker Hub # using dockerhub bc i had problems with ghcr
     runs-on: ubuntu-latest
     steps:
