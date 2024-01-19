@@ -1,7 +1,8 @@
 version: '3'
 services:
   api:
-    image: docker.io/mathioussee/final-test-mathiousse:ddevelopment
+    image: docker.io/mathioussee/final-test-mathiousse:ddevelopment 
+    
     ports:
       - "8080:3000"
     environment:
