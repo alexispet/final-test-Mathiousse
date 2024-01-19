@@ -122,36 +122,36 @@ jobs:
         run: pip install ansible
 
       - name: Run Ansible Playbook
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-          ansible-playbook ansible/playbook.yml -i ansible/inventory.ini -v
+          mkdir .ssh
+          echo "$SSH_KEY" > .ssh/key
+          chmod 600 .ssh/key
+      - name: run exporters playbook
+        run: |
+          ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml
   notify:
     needs: [deploy]
-    if: success() || failure()
+    if: success()
     runs-on: ubuntu-latest
     steps:
-      - name: if success
-        if: success()
-        run: echo "success"
-      - name: if failure
-        if: failure()
-        run: echo "failure"
-
       - name: notify-success
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
           message: "Deployment has been done successfully."
 
+  notify-failure:
+    needs: [deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
       - name: notify-failure
         uses: containrrr/shoutrrr-action@v1
         with:
           url: discord://lQeztUIsilaSTwO1KQ_TAexCLmrIz5isVKHp9JMRe7Idk7nKI8WHfuKsAbpKsqgtYlgh@1197830617690292234
           message: "Deployment has failed... :("
-
   #     - name: Send Discord message
   #       uses: containrrr/shoutrrr-action@v1
   #       with:
