@@ -3,9 +3,6 @@ run-name: ${{ github.actor }} is ruinning ${{ github.workflow }} on ${{ github.e
 
 on:
   push:
-  schedule:
-    - cron: "0 0 * * *"
-
 env:
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_USER: ${{ secrets.DB_USER }}
